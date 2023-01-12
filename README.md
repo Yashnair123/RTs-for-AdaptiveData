@@ -22,7 +22,7 @@ All driver runscripts take as command line input a "style" (i.e., the type of re
 
 The full command line input for `interval_driver.py` comprises 9 arguments: 1. number of trials/repetitions to be run, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. style, 6. whether or not to use the weighted MC randomization test (i.e., `True` if using the weighted MC randomization test and `False` if using the unweighted MCMC randomization test), 7. value of $\epsilon$ to be used (when the adaptive assignment involves an $\epsilon$-greedy action-selection), 8. number of resamples $m$, 9. type of interval (i.e., either `conformal` or `confidence`). Similarly, the command line input for `interval_driver.py` involves 7 arguments: 1. number of trials, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. style, 6. $\epsilon$, 7. number of resamples $m$. 
 
-Two example command line inputs for these to driver runscripts are thus `1000 100 0 epsilon_greedy i True 0.1 100 conformal` and `python interval_driver.py 1000 100 0 epsilon_greedy i 0.1 100`.
+Two example command line inputs for these to driver runscripts are thus `1000 100 0 epsilon_greedy i True 0.1 100 conformal` and `python interval_driver.py 1000 100 0 epsilon_greedy i 0.1 100`, respectively.
 
 Beyond the inputs described above, the testing driver runscript also takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment in which the test is being run. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
 
