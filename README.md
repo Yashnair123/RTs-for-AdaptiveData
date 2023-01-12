@@ -39,6 +39,9 @@ The full command line input for `testing_driver.py` then comprises 10 arguments:
 
 ### Simulation-specific scripts
 These scripts are contained in the directories `bandit_non_stationarity`, `factored_bandit_distributional`, `contextual_bandit_distributional`, `mdp_nonstationarity`, and `contextual_non_stationarity` which correspond, respectively, to settings 0, 1, 2, 3, and 4. Each of the scripts in these directories contains code for the adaptive assignment algorithm (as well as the corresponding action-selection probability calculations) in the setting being considered as well as code for the resampling procedures we consider in these settings. So, for example, the file `epsilon_greedy.py` in `bandit_non_stationarity` contains code for the $\epsilon$-greedy adaptive assignment algorithm (and its action-selection probabilities) described in Section 5.2.1 as well as code for resampling from and computing (conditional) resampling probabilities under:
-``math
+```math
 \text{uniform}_{\pi}, \text{ } \text{imitation}_{\pi}, \text{ } \text{re-imitation}_{\pi}, \text{ or } \text{cond-imitation}_{\pi}.
-``
+```
+
+### Global scripts
+There are two global scripts: `test_statistics.py` and `randomization_tests.py`. The former simply gives code for each of the test statistics in the various simulations/environments considered in the paper. The latter supplies code for the general randomization testing framework, taking as input the test statistic, adaptive assignment algorithm, and resampling procedure from other files.
