@@ -10,11 +10,15 @@ All driver runscripts take as command line input a "style" (i.e., the type of re
 
 | Style  | Resampling procedure name |
 | ------------- | ------------- |
-| u  | Both $\text{uniform}_{\pi}$ and $\text{uniform}_X$  |
-| 1  | 5.1.2  |
-| 2  | 5.1.1. |
-| 3  | 5.2.3. |
-| 4  | 5.2.2. |
+| `u`  | Both $\text{uniform}_{\pi}$ and $\text{uniform}_X$  |
+| `i_X`  | $\text{imitation}_{X}$  |
+| `i`  | $\text{imitation}_{\pi}$ |
+| `r`  | $\text{re-imitation}_{\pi}$ |
+| `c`  | $\text{cond-imitation}_{\pi}$ |
+| `uu_X` | $\text{uniform}_{\pi}\text{+}\text{uniform}_X$  |
+| `ui_X` | $\text{uniform}_{\pi}\text{+}\text{imitation}_X$  |
+| `rui_X` | $\text{restricted-uniform}_{\pi}\text{+}\text{imitation}_X$  |
+| `comb` | $\text{combined}_{\pi,X}$  |
 
 Furthermore, the testing driver runscript takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment being considered. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
 
