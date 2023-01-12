@@ -5,3 +5,15 @@ Our code is comprised of driver runscripts, simulation-specific scripts (contain
 
 ### Driver runscripts
 There are three driver runscripts to be used to reproduce the simulations run in Simulation 5: 1. `testing_driver.py`, 2. `interval_driver.py`, and 3. `conformal_interval_driver_share.py`. These three scripts are, respectively, responsible for running 1. hypothesis testing simulations, 2. confidence and conformal prediction interval construction (without sample sharing) simulations, and 3. conformal prediction interval construction with sample sharing simulations. 
+
+The testing driver runscript takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment being considered. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
+
+| Setting number  | Simulation subsection |
+| ------------- | ------------- |
+| 0  | 5.2.1  |
+| 1  | 5.1.2  |
+| 2  | 5.1.1. |
+| 3  | 5.2.3. |
+| 4  | 5.2.2. |
+
+
