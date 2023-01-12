@@ -5,9 +5,9 @@ Algorithm-specific file for non-stationarity testing with epsilon-greedy.
 This file contains:
     1. data generation process for epsilon-greedy
     2. data weight calculation for epsilon-greedy
-    3. various proposal sampling processes for epsilon-greedy
+    3. various resampling procedures for epsilon-greedy
        in the setting of non-stationarity test in a 2-armed bandit
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resampling procedures
 """
 import numpy as np
 import copy
@@ -37,7 +37,7 @@ class EpsilonGreedy:
             a = np.random.choice(2, p=[self.epsilon/2 + (1-argmax)*(1-self.epsilon), \
                 self.epsilon/2 + argmax*(1-self.epsilon)]) if argmax != 'undecided' else np.random.choice(2)
 
-            # if doing simulation3, keep track of coin flips (if argmax is 'undecided', the argmax is default 1 but coin flip is 
+            # if doing cond_imitation, keep track of coin flips (if argmax is 'undecided', the argmax is default 1 but coin flip is 
             # with 1/2 probability)
             if self.conditional:
                 if argmax != 'undecided':
@@ -60,7 +60,7 @@ class EpsilonGreedy:
         a = np.random.choice(2, p=[self.epsilon/2 + (1-argmax)*(1-self.epsilon), \
             self.epsilon/2 + argmax*(1-self.epsilon)]) if argmax != 'undecided' else np.random.choice(2)
 
-        # if doing simulation3, keep track of the last coin flip as well
+        # if doing cond_imitation, keep track of the last coin flip as well
         if self.conditional:
             if argmax != 'undecided':
                 self.coin_flips.append(1 if a == argmax else 0)
@@ -95,7 +95,7 @@ class EpsilonGreedy:
             argmax = np.argmax(action_sums/action_counters) if \
                 np.all(action_counters > np.zeros(2)) else 'undecided'
 
-            # if doing simulation3, then need to follow the coin flips
+            # if doing cond_imitation, then need to follow the coin flips
             if self.conditional:
                 coin_flip = self.coin_flips[i]
                 if argmax != 'undecided':
@@ -114,7 +114,7 @@ class EpsilonGreedy:
             action_counters[a] += 1
             action_sums[a] += r
         
-        # return slightly differently if doing simulation3
+        # return slightly differently if doing cond_imitation
         if self.conditional:
             return 1.
         else:
@@ -152,7 +152,7 @@ class EpsilonGreedy:
                         argmax = np.argmax(b_action_sums/b_action_counters) if \
                             np.all(b_action_counters > np.zeros(2)) else 'undecided'
 
-                        # if doing simulation3, then need to follow the coin flips
+                        # if doing cond_imitation, then need to follow the coin flips
                         if self.conditional:
                             coin_flip = self.coin_flips[j]
                             if argmax != 'undecided':
@@ -179,7 +179,7 @@ class EpsilonGreedy:
                 argmax = np.argmax(action_sums/action_counters) if \
                     np.all(action_counters > np.zeros(2)) else 'undecided'
 
-                # if doing simulation3, then need to follow the coin flips
+                # if doing cond_imitation, then need to follow the coin flips
                 if self.conditional:
                     coin_flip = self.coin_flips[i]
                     if argmax != 'undecided':
@@ -222,9 +222,9 @@ class EpsilonGreedy:
             return 1.
 
 
-    def simulation1(self, data, propose_or_weight):
-        ''''The simulation1 distribution samples without replacement, 
-        proportional to the policy probabilities'''
+    def imitation(self, data, propose_or_weight):
+        ''''The imitation distribution samples without replacement, 
+        proportional to the action-selection probabilities'''
         
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
@@ -290,8 +290,8 @@ class EpsilonGreedy:
             return prob
 
 
-    def simulation2(self, data, propose_or_weight):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation(self, data, propose_or_weight):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
 
@@ -299,17 +299,17 @@ class EpsilonGreedy:
         and False if calculating the weight'''
 
         if propose_or_weight:
-            return self.simulation2_propose(data)
+            return self.re_imitation_propose(data)
         else:
-            return self.simulation2_weight(data)
+            return self.re_imitation_weight(data)
 
 
-    def simulation2_propose(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_propose(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
         
-        '''This function just samples from the proposal'''
+        '''This function just samples from the distribution'''
 
         prob = 1.
 
@@ -376,8 +376,8 @@ class EpsilonGreedy:
         return shuffled_data, prob
 
 
-    def simulation2_weight(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_weight(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
         
@@ -441,9 +441,9 @@ class EpsilonGreedy:
         return prob
 
 
-    def simulation3(self, data, propose_or_weight):
-        ''''The simulation3 distribution samples without replacement, 
-        using the simulation3 distribution'''
+    def cond_imitation(self, data, propose_or_weight):
+        ''''The cond_imitation distribution samples without replacement, 
+        using the cond_imitation distribution'''
         
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
@@ -510,21 +510,21 @@ class EpsilonGreedy:
     def get_proposal(self, data, style):
         if style == 'u':
             return self.uniform(data, True)
-        if style == 's1':
-            return self.simulation1(data, True)
-        if style == 's2':
-            return self.simulation2(data, True)
-        if style == 's3':
-            return self.simulation3(data, True)
+        if style == 'i':
+            return self.imitation(data, True)
+        if style == 'r':
+            return self.re_imitation(data, True)
+        if style == 'c':
+            return self.cond_imitation(data, True)
         
 
 
     def get_proposal_weight(self, proposal, starting, style):
         if style == 'u':
             return self.uniform(proposal, False)
-        if style == 's1':
-            return self.simulation1(proposal, False)
-        if style == 's2':
-            return self.simulation2(proposal, False)
-        if style == 's3':
-            return self.simulation3(proposal, False)
+        if style == 'i':
+            return self.imitation(proposal, False)
+        if style == 'r':
+            return self.re_imitation(proposal, False)
+        if style == 'c':
+            return self.cond_imitation(proposal, False)

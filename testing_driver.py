@@ -29,7 +29,7 @@ T = int(sys.argv[2])
 trials = int(sys.argv[1])
 
 alpha = 0.05
-styles = ['u', 's', 's1', 's2', 's3', 'uu', 'us', 'rus', 's1u', 's1s', 'c', 's2s', 's3s']
+styles = ['u', 'i_X', 'i', 'r', 'c', 'uu_X', 'ui_X', 'rui_X', 'iu_X', 'ii_X', 'comb', 'ri_X', 'ci_X']
 
 np.random.seed([setting, T, j, int(algo_name[0] == 'e'), int(null), styles.index(style), int(mc), int(100*epsilon), \
     num_samples, trials])
@@ -48,14 +48,14 @@ for job_ind in range(trials):
         test_stat = test_statistics.bandit_non_stationarity
         file_name = f'bandit_non_stationarity/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}'
         if algo_name == 'epsilon_greedy':
-            algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3' else False)
+            algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='c' else False)
         if algo_name == 'ucb':
-            algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='s3' else False)
+            algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='c' else False)
     if setting == 1:
         test_stat = test_statistics.factored_bandit_distributional
         file_name = f'factored_bandit_distributional/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}'
         if algo_name == 'epsilon_greedy':
-            algorithm = factored_bandit_distributional.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3s' else False)
+            algorithm = factored_bandit_distributional.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='ci_X' else False)
         if algo_name == 'ucb':
             algorithm = factored_bandit_distributional.ucb.UCB(T, null)
     if setting == 2:
@@ -69,19 +69,17 @@ for job_ind in range(trials):
         test_stat = test_statistics.mdp_non_stationarity
         file_name = f'mdp_non_stationarity/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}'
         if algo_name == 'epsilon_greedy':
-            algorithm = mdp_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3' else False)
+            algorithm = mdp_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='c' else False)
     if setting == 4:
         test_stat = test_statistics.contextual_bandit_non_stationarity
         file_name = f'contextual_non_stationarity/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}'
         if algo_name == 'elinucb':
-            algorithm = contextual_non_stationarity.elinucb.ELinUCB(T, epsilon, 100, null, True if style=='s3' else False)
+            algorithm = contextual_non_stationarity.elinucb.ELinUCB(T, epsilon, 100, null, True if style=='c' else False)
         if algo_name == 'epsilon_greedy':
-            algorithm = contextual_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, 100, null, True if style=='s3' else False)
+            algorithm = contextual_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, 100, null, True if style=='c' else False)
     
     # get the true dataset
     true_data = algorithm.get_dataset()
-
-    #print([true_data[i][0][0] for i in range(len(true_data))])
 
     # obtain the p-values
     if mc:

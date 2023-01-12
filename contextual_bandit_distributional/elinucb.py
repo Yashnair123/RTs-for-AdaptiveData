@@ -5,10 +5,10 @@ Algorithm-specific file for conditional independence testing with epsilon-LinUCB
 This file contains:
     1. data generation process for epsilon-LinUCB
     2. data weight calculation for epsilon-LinUCB
-    3. various proposal sampling processes for epsilon-LinUCB
+    3. various resampling procedures for epsilon-LinUCB
        in the setting of conditional indepenence testing in
        a contextual bandit
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resapling procedures
 
 NB: set epsilon = 0 to simply get regular LinUCB
 """
@@ -139,7 +139,7 @@ class ELinUCB:
         else:
             return 1.
     
-    def simulation_X(self, data, propose_or_weight, b_ci):
+    def imitation_X(self, data, propose_or_weight, b_ci):
         probability = 1.
 
         if propose_or_weight:
@@ -196,24 +196,24 @@ class ELinUCB:
     
     
     def get_proposal(self, data, style, b_ci=0):
-        if style == 's':
-            return self.simulation_X(data, True, b_ci)
+        if style == 'i_X':
+            return self.imitation_X(data, True, b_ci)
         if style == 'u':
             return self.uniform_X(data, True)
-        if style == 'us':
+        if style == 'ui_X':
             intermediary, prob = self.uniform_permute(data, True)
-            return self.simulation_X(intermediary, True, b_ci)
-        if style == 'uu':
+            return self.imitation_X(intermediary, True, b_ci)
+        if style == 'uu_X':
             intermediary, prob = self.uniform_permute(data, True)
             return self.uniform_X(intermediary, True)
         
 
     def get_proposal_weight(self, proposal, starting, style, b_ci=0):
-        if style == 's':
-            return self.simulation_X(proposal, False, b_ci)
+        if style == 'i_X':
+            return self.imitation_X(proposal, False, b_ci)
         if style == 'u':
             return self.uniform_X(proposal, False)
-        if style == 'us':
-            return self.simulation_X(proposal, False, b_ci)
-        if style == 'uu':
+        if style == 'ui_X':
+            return self.imitation_X(proposal, False, b_ci)
+        if style == 'uu_X':
             return self.uniform_X(proposal, False)

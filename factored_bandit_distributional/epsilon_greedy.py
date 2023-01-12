@@ -5,10 +5,10 @@ Algorithm-specific file for distributional testing with epsilon-greedy.
 This file contains:
     1. data generation process for epsilon-greedy
     2. data weight calculation for epsilon-greedy
-    3. various proposal sampling processes for epsilon-greedy
+    3. various resampling procedures for epsilon-greedy
        in the setting of a distributional in a 3-armed bandit
        viewed as a factored bandit
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resampling procedures
 """
 import numpy as np
 import copy
@@ -123,7 +123,7 @@ class EpsilonGreedy:
                 np.all(action_counters > np.zeros(3)) else 'undecided'
 
 
-            # if doing simulation3, then need to follow the coin flips
+            # if doing cond_imitation, then need to follow the coin flips
             if self.conditional:
                 coin_flip = self.coin_flips[i]
                 if curr_arg_max == 'undecided':
@@ -218,9 +218,9 @@ class EpsilonGreedy:
 
 
 
-    def simulation1(self, data, propose_or_weight, b_ci=0):
-        ''''The simulation1 distribution samples without replacement, 
-        proportional to the policy probabilities'''
+    def imitation(self, data, propose_or_weight, b_ci=0):
+        ''''The imitation distribution samples without replacement, 
+        proportional to the action-selection probabilities'''
         
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
@@ -290,8 +290,8 @@ class EpsilonGreedy:
 
 
 
-    def simulation2(self, data, propose_or_weight, b_ci=0):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation(self, data, propose_or_weight, b_ci=0):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
 
@@ -376,9 +376,9 @@ class EpsilonGreedy:
             return prob
 
 
-    def simulation3(self, data, propose_or_weight, b_ci=0):
-        ''''The simulation3 distribution samples without replacement, 
-        using the simulation3 distribution'''
+    def cond_imitation(self, data, propose_or_weight, b_ci=0):
+        ''''The cond_imitation distribution samples without replacement, 
+        using the cond_imitation distribution'''
         
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
@@ -454,8 +454,7 @@ class EpsilonGreedy:
 
 
     def uniform_X(self, data, propose_or_weight):
-        '''This sampling scheme samples X's uniformly, except other than the first
-        two timesteps, whence it must select i, the timestep, as X'''
+        '''This sampling scheme samples X's uniformly'''
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
         if propose_or_weight:
@@ -465,7 +464,7 @@ class EpsilonGreedy:
             return 1.
 
 
-    def simulation_X(self, data, propose_or_weight, b_ci=0):
+    def imitation_X(self, data, propose_or_weight, b_ci=0):
         '''This sampling scheme samples X's from the simulation 
         distribution over X's'''
         '''The input propose_or_weight is True if doing sampling, 
@@ -608,45 +607,45 @@ class EpsilonGreedy:
     def get_proposal(self, data, style, b_ci=0):
         if style == 'u':
             return self.uniform_X(data, True)
-        if style == 's':
-            return self.simulation_X(data, True, b_ci)
-        if style == 'us':
+        if style == 'i_X':
+            return self.imitation_X(data, True, b_ci)
+        if style == 'ui_X':
             intermediary, prob = self.uniform_permute(data, True)
-            return self.simulation_X(intermediary, True, b_ci)
-        if style == 'rus':
+            return self.imitation_X(intermediary, True, b_ci)
+        if style == 'rui_X':
             intermediary, prob = self.restricted_uniform_permute(data, True)
-            return self.simulation_X(intermediary, True, b_ci)
-        if style == 'uu':
+            return self.imitation_X(intermediary, True, b_ci)
+        if style == 'uu_X':
             intermediary, prob = self.uniform_permute(data, True)
             return self.uniform_X(intermediary, True)
-        if style == 'c':
+        if style == 'comb':
             return self.combined(data, True, b_ci)
-        if style == 's1s':
-            intermediary, prob = self.simulation1(data, True, b_ci)
-            return self.simulation_X(intermediary, True, b_ci)
-        if style == 's2s':
-            intermediary, prob = self.simulation2(data, True, b_ci)
-            return self.simulation_X(intermediary, True, b_ci)
-        if style == 's3s':
-            intermediary, prob = self.simulation3(data, True, b_ci)
-            return self.simulation_X(intermediary, True, b_ci)
+        if style == 'ii_X':
+            intermediary, prob = self.imitation(data, True, b_ci)
+            return self.imitation_X(intermediary, True, b_ci)
+        if style == 'ri_X':
+            intermediary, prob = self.re_imitation(data, True, b_ci)
+            return self.imitation_X(intermediary, True, b_ci)
+        if style == 'ci_X':
+            intermediary, prob = self.cond_imitation(data, True, b_ci)
+            return self.imitation_X(intermediary, True, b_ci)
         
 
 
     def get_proposal_weight(self, proposal, starting, style, b_ci=0):
         if style == 'u':
             return self.uniform_X(proposal, False)
-        if style == 's':
-            return self.simulation_X(proposal, False, b_ci)
-        if style == 'us':
-            return self.simulation_X(proposal, False, b_ci)
-        if style == 'rus':
-            return self.simulation_X(proposal, False, b_ci)
-        if style == 'uu':
+        if style == 'i_X':
+            return self.imitation_X(proposal, False, b_ci)
+        if style == 'ui_X':
+            return self.imitation_X(proposal, False, b_ci)
+        if style == 'rui_X':
+            return self.imitation_X(proposal, False, b_ci)
+        if style == 'uu_X':
             return self.uniform_X(proposal, False)
-        if style == 'c':
+        if style == 'comb':
             return self.combined(proposal, False, b_ci)
-        if style == 's1s':
+        if style == 'ii_X':
             intermediary = []
             starting_reward_seq = [starting[i][1] for i in range(len(starting))]
             for i in range(len(proposal)):
@@ -654,10 +653,10 @@ class EpsilonGreedy:
                 intermediary.append((starting[starting_index][0], proposal[i][1]))
             
             # calculate the probability of drawing the permutation
-            permute_prob = self.simulation1(intermediary, False, b_ci)
-            action_prob = self.simulation_X(proposal, False, b_ci)
+            permute_prob = self.imitation(intermediary, False, b_ci)
+            action_prob = self.imitation_X(proposal, False, b_ci)
             return permute_prob*action_prob
-        if style == 's2s':
+        if style == 'ri_X':
             intermediary = []
             starting_reward_seq = [starting[i][1] for i in range(len(starting))]
             for i in range(len(proposal)):
@@ -665,10 +664,10 @@ class EpsilonGreedy:
                 intermediary.append((starting[starting_index][0], proposal[i][1]))
             
             # calculate the probability of drawing the permutation
-            permute_prob = self.simulation2(intermediary, False, b_ci)
-            action_prob = self.simulation_X(proposal, False, b_ci)
+            permute_prob = self.re_imitation(intermediary, False, b_ci)
+            action_prob = self.imitation_X(proposal, False, b_ci)
             return permute_prob*action_prob
-        if style == 's3s':
+        if style == 'ci_X':
             intermediary = []
             starting_reward_seq = [starting[i][1] for i in range(len(starting))]
             for i in range(len(proposal)):
@@ -676,6 +675,6 @@ class EpsilonGreedy:
                 intermediary.append((starting[starting_index][0], proposal[i][1]))
             
             # calculate the probability of drawing the permutation
-            permute_prob = self.simulation3(intermediary, False, b_ci)
-            action_prob = self.simulation_X(proposal, False, b_ci)
+            permute_prob = self.cond_imitation(intermediary, False, b_ci)
+            action_prob = self.imitation_X(proposal, False, b_ci)
             return permute_prob*action_prob

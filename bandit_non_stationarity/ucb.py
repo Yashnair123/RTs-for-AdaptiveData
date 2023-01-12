@@ -5,9 +5,9 @@ Algorithm-specific file for non-stationarity testing with UCB.
 This file contains:
     1. data generation process for UCB
     2. data weight calculation for UCB
-    3. various proposal sampling processes for UCB
+    3. various resampling procedures for UCB
        in the setting of non-stationarity test in a 2-armed bandit
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resampling procedures
 """
 import numpy as np
 import copy
@@ -228,8 +228,8 @@ class UCB:
             return 1.
 
     
-    def simulation1(self, data, propose_or_weight):
-        ''''The simulation1 distribution samples without replacement, 
+    def imitation(self, data, propose_or_weight):
+        ''''The imitation distribution samples without replacement, 
         proportional to the policy probabilities'''
         
         '''The input propose_or_weight is True if doing sampling, 
@@ -290,7 +290,7 @@ class UCB:
             action_counters[data[sample][0]] += 1
             action_sums[data[sample][0]] += data[sample][1]
         
-        # note that there is no reason to calculate probabilities as simulation1 is
+        # note that there is no reason to calculate probabilities as imitation is
         # truncated uniform sampling
         if propose_or_weight:
             return shuffled_data, prod
@@ -298,8 +298,8 @@ class UCB:
             return prod
 
 
-    def simulation3(self, data, propose_or_weight):
-        ''''The simulation3 distribution samples without replacement, 
+    def cond_imitation(self, data, propose_or_weight):
+        ''''The cond_imitation distribution samples without replacement, 
         proportional to the policy probabilities, conditionally'''
         
         '''The input propose_or_weight is True if doing sampling, 
@@ -361,7 +361,7 @@ class UCB:
             action_counters[data[sample][0]] += 1
             action_sums[data[sample][0]] += data[sample][1]
         
-        # note that there is no reason to calculate probabilities as simulation1 is
+        # note that there is no reason to calculate probabilities as imitation is
         # truncated uniform sampling
         if propose_or_weight:
             return shuffled_data, 1.
@@ -373,17 +373,17 @@ class UCB:
     def get_proposal(self, data, style):
         if style == 'u':
             return self.uniform(data, True)
-        if style == 's1':
-            return self.simulation1(data, True)
-        if style == 's3':
-            return self.simulation3(data, True)
+        if style == 'i':
+            return self.imitation(data, True)
+        if style == 'c':
+            return self.cond_imitation(data, True)
         
 
 
     def get_proposal_weight(self, proposal, starting, style):
         if style == 'u':
             return self.uniform(proposal, False)
-        if style == 's1':
-            return self.simulation1(proposal, False)
-        if style == 's3':
-            return self.simulation3(proposal, False)
+        if style == 'i':
+            return self.imitation(proposal, False)
+        if style == 'c':
+            return self.cond_imitation(proposal, False)

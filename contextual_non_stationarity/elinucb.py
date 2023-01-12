@@ -5,10 +5,10 @@ Algorithm-specific file for non-stationarity testing with epsilon-LinUCB.
 This file contains:
     1. data generation process for epsilon-LinUCB
     2. data weight calculation for epsilon-LinUCB
-    3. various proposal sampling processes for epsilon-LinUCB
+    3. various resampling procedures for epsilon-LinUCB
        in the setting of non-stationarity testing in
        a contextual bandit
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resampling procedures
 
 NB: set epsilon = 0 to simply get regular LinUCB
 """
@@ -152,9 +152,9 @@ class ELinUCB:
             # uniform sampling always has weight 1
             return 1.
 
-    def simulation1(self, data, propose_or_weight):
-        ''''The simulation1 distribution samples without replacement, 
-        proportional to the policy probabilities'''
+    def imitation(self, data, propose_or_weight):
+        ''''The imitation distribution samples without replacement, 
+        proportional to the action-selection probabilities'''
         
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
@@ -236,21 +236,21 @@ class ELinUCB:
             return prob
 
 
-    def simulation2(self, data, propose_or_weight):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation(self, data, propose_or_weight):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily wrt LinUCB and then samples 
         correspondingly from the remaining timesteps.'''
 
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
         if propose_or_weight:
-            return self.simulation2_propose(data)
+            return self.re_imitation_propose(data)
         else:
-            return self.simulation2_weight(data)
+            return self.re_imitation_weight(data)
 
 
-    def simulation2_propose(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_propose(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily wrt LinUCB and then samples 
         correspondingly from the remaining timesteps.'''
         
@@ -346,8 +346,8 @@ class ELinUCB:
         return shuffled_data, prob
 
     
-    def simulation2_weight(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_weight(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily wrt LinUCB and then samples 
         correspondingly from the remaining timesteps.'''
         
@@ -448,8 +448,8 @@ class ELinUCB:
         return prob
 
 
-    def simulation3(self, data, propose_or_weight):
-        ''''The simulation3 distribution samples without replacement, 
+    def cond_imitation(self, data, propose_or_weight):
+        ''''The cond_imitation distribution samples without replacement, 
         conditioning on the coin flips made by elinucb'''
         
         '''The input propose_or_weight is True if doing sampling, 
@@ -531,23 +531,23 @@ class ELinUCB:
     def get_proposal(self, data, style):
         if style == 'u':
             return self.uniform(data, True)
-        if style == 's1':
-            return self.simulation1(data, True)
-        if style == 's2':
-            return self.simulation2(data, True)
-        if style == 's3':
-            return self.simulation3(data, True)
+        if style == 'i':
+            return self.imitation(data, True)
+        if style == 'r':
+            return self.re_imitation(data, True)
+        if style == 'c':
+            return self.cond_imitation(data, True)
         
 
 
     def get_proposal_weight(self, proposal, starting, style):
         if style == 'u':
             return self.uniform(proposal, False)
-        if style == 's1':
-            return self.simulation1(proposal, False)
-        if style == 's2':
-            return self.simulation2(proposal, False)
-        if style == 's3':
-            return self.simulation3(proposal, False)
+        if style == 'i':
+            return self.imitation(proposal, False)
+        if style == 'r':
+            return self.re_imitation(proposal, False)
+        if style == 'c':
+            return self.cond_imitation(proposal, False)
                 
                 

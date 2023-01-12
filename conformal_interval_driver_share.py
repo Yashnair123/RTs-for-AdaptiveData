@@ -22,7 +22,7 @@ T = int(sys.argv[2])
 trials = int(sys.argv[1])
 
 alpha = 0.05
-styles = ['u', 's', 's1', 's2', 's3', 'uu', 'us', 'rus', 's1u', 's1s', 'c']
+styles = ['u', 'i_X', 'i', 'r', 'c', 'uu_X', 'ui_X', 'rui_X', 'iu_X', 'ii_X', 'comb']
 
 np.random.seed([T, j, styles.index(style), int(100*epsilon), \
     num_samples, trials])
@@ -39,9 +39,9 @@ for job_ind in range(trials):
 
     test_stat = test_statistics.bandit_non_stationarity 
     if algo_name == 'epsilon_greedy':
-        algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3' else False)
+        algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='c' else False)
     if algo_name == 'ucb':
-        algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='s3' else False)
+        algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='c' else False)
 
     # get the true dataset
     true_data = algorithm.get_dataset()

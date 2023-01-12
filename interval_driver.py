@@ -26,7 +26,7 @@ T = int(sys.argv[2])
 trials = int(sys.argv[1])
 
 alpha = 0.05
-styles = ['u', 's', 's1', 's2', 's3', 'uu', 'us', 'rus', 's1u', 's1s', 'c', 's2s', 's3s']
+styles = ['u', 'i_X', 'i', 'r', 'c', 'uu_X', 'ui_X', 'rui_X', 'iu_X', 'ii_X', 'comb', 'ri_X', 'ci_X']
 
 np.random.seed([T, j, styles.index(style), int(mc), int(100*epsilon), \
     num_samples, trials])
@@ -44,13 +44,13 @@ for job_ind in range(trials):
     if type == 'conformal':
         test_stat = test_statistics.bandit_non_stationarity 
         if algo_name == 'epsilon_greedy':
-            algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3' else False)
+            algorithm = bandit_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='c' else False)
         if algo_name == 'ucb':
-            algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='s3' else False)
+            algorithm = bandit_non_stationarity.ucb.UCB(T, null, True if style=='c' else False)
     if type == 'confidence':
         test_stat = test_statistics.factored_bandit_distributional
         if algo_name == 'epsilon_greedy':
-            algorithm = factored_bandit_distributional.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='s3s' else False, 4.) # b_0 = 4
+            algorithm = factored_bandit_distributional.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='ci_X' else False, 4.) # b_0 = 4
         if algo_name == 'ucb':
             algorithm = factored_bandit_distributional.ucb.UCB(T, null, 4.) # b_0 = 4
     

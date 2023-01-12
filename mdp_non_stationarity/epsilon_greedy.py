@@ -6,9 +6,9 @@ with epsilon-greedy selection in an MDP.
 This file contains:
     1. data generation process for epsilon-greedy
     2. data weight calculation for epsilon-greedy
-    3. various proposal sampling processes for epsilon-greedy
+    3. various resampling procedures for epsilon-greedy
        in the setting of an MDP with 3 states and 2 actions
-    4. proposal sampling weighting calculations for the above proposals
+    4. resampling weighting calculations for the above resampling distributions
 """
 import numpy as np
 
@@ -222,9 +222,9 @@ class EpsilonGreedy:
                 return 1.
 
         
-    def simulation1(self, data, propose_or_weight):
-        '''This sampling scheme samples permutations from the uniform 
-        distribution over permutations'''
+    def imitation(self, data, propose_or_weight):
+        '''This sampling scheme samples permutations from the imitation distributions 
+        distribution over permutations of MDP data'''
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
         # will convert the data into the usual "string" of the
@@ -289,7 +289,7 @@ class EpsilonGreedy:
                 if len(indices) == 0:
                     return 'flag', 1.
                 
-                # sample according to the simulation1 distribution
+                # sample according to the imitation distribution
                 # first set the probs p-vector over these selectable indices
                 for i_ in indices:
                     # calculate the Q function for each of these indices
@@ -349,22 +349,22 @@ class EpsilonGreedy:
             return prod
 
 
-    def simulation2(self, data, propose_or_weight):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation(self, data, propose_or_weight):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
 
         if propose_or_weight:
-            return self.simulation2_propose(data)
+            return self.re_imitation_propose(data)
         else:
-            return self.simulation2_weight(data)
+            return self.re_imitation_weight(data)
 
 
 
-    def simulation2_propose(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_propose(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
         
@@ -437,7 +437,7 @@ class EpsilonGreedy:
                 # also determine if we were forced to pick a certain action by using "forced"
                 forced = True
 
-                # sample according to the simulation2 distribution
+                # sample according to the re_imitation distribution
                 # first set the probs p-vector over these selectable indices
                 for i_ in indices:
                     # calculate the Q function for each of these indices
@@ -502,8 +502,8 @@ class EpsilonGreedy:
         return shuffled_data, prod
 
 
-    def simulation2_weight(self, data):
-        ''''The simulation2 distribution samples, at each timestep, an action
+    def re_imitation_weight(self, data):
+        ''''The re_imitation distribution samples, at each timestep, an action
         based on the previously selected data, epsilon-greedily and then samples 
         correspondingly from the remaining timesteps.'''
         
@@ -611,7 +611,7 @@ class EpsilonGreedy:
                     if curr_greedy_or_not != sampled_greedy_or_not:
                         forced = False
                 
-                # now calculate weights according to the simulation2 distribution
+                # now calculate weights according to the re_imitation distribution
                 # first set the probs p-vector over these selectable indices
                 for i_ in indices:
                     # calculate the Q function for each of these indices
@@ -657,9 +657,9 @@ class EpsilonGreedy:
         return prod
 
 
-    def simulation3(self, data, propose_or_weight):
+    def cond_imitation(self, data, propose_or_weight):
         '''This sampling scheme samples permutations according to the 
-        simulation3 distribution'''
+        cond_imitation distribution'''
         '''The input propose_or_weight is True if doing sampling, 
         and False if calculating the weight'''
 
@@ -725,7 +725,7 @@ class EpsilonGreedy:
                 if len(indices) == 0:
                     return 'flag', 1.
                 
-                # sample according to the simulation1 distribution
+                # sample according to the imitation distribution
                 # first set the probs p-vector over these selectable indices
                 for i_ in indices:
                     # calculate the Q function for each of these indices
@@ -787,21 +787,21 @@ class EpsilonGreedy:
     def get_proposal(self, data, style):
         if style == 'u':
             return self.uniform(data, True)
-        if style == 's1':
-            return self.simulation1(data, True)
-        if style == 's2':
-            return self.simulation2(data, True)
-        if style == 's3':
-            return self.simulation3(data, True)
+        if style == 'i':
+            return self.imitation(data, True)
+        if style == 'r':
+            return self.re_imitation(data, True)
+        if style == 'c':
+            return self.cond_imitation(data, True)
         
 
 
     def get_proposal_weight(self, proposal, starting, style):
         if style == 'u':
             return self.uniform(proposal, False)
-        if style == 's1':
-            return self.simulation1(proposal, False)
-        if style == 's2':
-            return self.simulation2(proposal, False)
-        if style == 's3':
-            return self.simulation3(proposal, False)
+        if style == 'i':
+            return self.imitation(proposal, False)
+        if style == 'r':
+            return self.re_imitation(proposal, False)
+        if style == 'c':
+            return self.cond_imitation(proposal, False)
