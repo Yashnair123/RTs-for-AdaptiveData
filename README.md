@@ -24,10 +24,10 @@ Furthermore, the testing driver runscript takes as one of its command line argum
 
 | Setting number  | Simulation subsection |
 | ------------- | ------------- |
-| 0  | 5.2.1  |
-| 1  | 5.1.2  |
-| 2  | 5.1.1. |
-| 3  | 5.2.3. |
-| 4  | 5.2.2. |
+| `0`  | 5.2.1  |
+| `1`  | 5.1.2  |
+| `2`  | 5.1.1. |
+| `3`  | 5.2.3. |
+| `4`  | 5.2.2. |
 
 The full command line input for `testing_driver.py` comprises 10 arguments: 1. the number of desired trials/repetitions to be run, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. if the null hypothesis is being used
