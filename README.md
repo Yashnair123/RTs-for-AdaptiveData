@@ -20,7 +20,11 @@ All driver runscripts take as command line input a "style" (i.e., the type of re
 | `rui_X` | $\text{restricted-uniform}_{\pi}\text{+}\text{imitation}_X$  |
 | `comb` | $\text{combined}_{\pi,X}$  |
 
-Furthermore, the testing driver runscript takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment being considered. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
+The full command line input for `interval_driver.py` comprises 9 arguments: 1. number of trials/repetitions to be run, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. style, 6. whether or not to use the weighted MC randomization test (i.e., `True` if using the weighted MC randomization test and `False` if using the unweighted MCMC randomization test), 7. value of $\epsilon$ to be used (when the adaptive assignment involves an $\epsilon$-greedy action-selection), 8. number of resamples $m$, 9. type of interval (i.e., either `conformal` or `confidence`). Similarly, the command line input for `interval_driver.py` involves 7 arguments: 1. number of trials, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. style, 6. $\epsilon$, 7. number of resamples $m$. 
+
+Two example command line inputs for these to driver runscripts are thus `1000 100 0 epsilon_greedy i True 0.1 100 conformal` and `python interval_driver.py 1000 100 0 epsilon_greedy i 0.1 100`.
+
+Beyond the inputs described above, the testing driver runscript also takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment in which the test is being run. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
 
 | Setting number  | Simulation subsection |
 | ------------- | ------------- |
@@ -30,4 +34,4 @@ Furthermore, the testing driver runscript takes as one of its command line argum
 | `3`  | 5.2.3. |
 | `4`  | 5.2.2. |
 
-The full command line input for `testing_driver.py` comprises 10 arguments: 1. the number of desired trials/repetitions to be run, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. if the null hypothesis is being used
+The full command line input for `testing_driver.py` then comprises 10 arguments: 1. number of trials, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. whether or not the data is generated under the null (i.e., `True` if the data is drawn according to the null and `False` if it is drawn according to the alternative), 6. style, 7. whether or not to use the weighted MC randomization test, 8. $\epsilon$, 9. number of resamples $m$, 10. setting. Thus one example input for this runscript is `1000 100 0 epsilon_greedy False c True 0.1 100 1`.
