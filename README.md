@@ -30,9 +30,19 @@ Beyond the inputs described above, the testing driver runscript also takes as on
 | ------------- | ------------- |
 | `0`  | 5.2.1  |
 | `1`  | 5.1.2  |
-| `2`  | 5.1.1. |
-| `3`  | 5.2.3. |
-| `4`  | 5.2.2. |
+| `2`  | 5.1.1 |
+| `3`  | 5.2.3 |
+| `4`  | 5.2.2 |
+
+We additionally list the adaptive assignment algorithm names considered in each of the various settings (`elinucb` stands for $\epsilon$-LinUCB; when $\epsilon = 0$ this is simply the LinUCB adaptive assignment algorithm considered in Section 5 of the paper).
+
+| Setting number  | Adaptive assignment algorithm|
+| ------------- | ------------- |
+| `0`  | `epsilon_greedy` and `ucb`  |
+| `1`  |  `epsilon_greedy` and `ucb` |
+| `2`  | `elinucb` and `epsilon_greedy` |
+| `3`  | `epsilon_greedy` |
+| `4`  | `elinucb` and `epsilon_greedy` |
 
 The full command line input for `testing_driver.py` then comprises 10 arguments: 1. number of trials, 2. horizon $T$, 3. job/seed number, 4. adaptive assignment algorithm name, 5. whether or not the data is generated under the null (i.e., `True` if the data is drawn according to the null and `False` if it is drawn according to the alternative), 6. style, 7. whether or not to use the weighted MC randomization test, 8. $\epsilon$, 9. number of resamples $m$, 10. setting. Thus one example input for this runscript is `1000 100 0 epsilon_greedy False c True 0.1 100 1`.
 
