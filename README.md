@@ -1,7 +1,7 @@
 # RTs-for-AdaptiveData
 
 ## Code layout
-Our code is comprised of driver runscripts, simulation-specific scripts (containing functions particular to the environment, adaptive assignment algorithm, and resampling procedure being considered in the particular simulation), and global scripts used across all simulations (i.e., test statistics as well as the weighted MC and unweighted MCMC randomization tests themselves). We describe these three types of scripts below. 
+Our code is comprised of 1. key runscripts that we run across many simulations which we call "driver" runscripts; 2. simulation-specific scripts (containing functions particular to the environment, adaptive assignment algorithm, and resampling procedure being considered in the particular simulation); and 3. global scripts used across all simulations (i.e., test statistics as well as the weighted MC and unweighted MCMC randomization tests themselves). We describe these three types of scripts below. 
 
 ### Driver runscripts
 There are three driver runscripts to be used to reproduce the simulations run in Section 5: 1. `testing_driver.py`, 2. `interval_driver.py`, and 3. `conformal_interval_driver_share.py`. These three scripts are, respectively, responsible for running 1. hypothesis testing simulations, 2. confidence and conformal prediction interval construction (without sample sharing) simulations, and 3. conformal prediction interval construction with sample sharing simulations. 
@@ -26,7 +26,7 @@ Two example command line inputs for these to driver runscripts are thus `1000 10
 
 Beyond the inputs described above, the testing driver runscript also takes as one of its command line arguments the "setting number" which corresponds to the simulation/environment in which the test is being run. The table below gives the correspondence between setting number and the corresponding simulation subsection of the paper:
 
-| Setting number  | Simulation subsection |
+| Setting number  | Simulation subsection in https://arxiv.org/abs/2301.05365|
 | ------------- | ------------- |
 | `0`  | 5.2.1  |
 | `1`  | 5.1.2  |
@@ -45,3 +45,5 @@ These scripts are contained in the directories `bandit_non_stationarity`, `facto
 
 ### Global scripts
 There are two global scripts: `test_statistics.py` and `randomization_tests.py`. The former simply gives code for each of the test statistics in the various simulations/environments considered in the paper. The latter supplies code for the general randomization testing framework, taking as input the test statistic, adaptive assignment algorithm, and resampling procedure from other files.
+
+All simulations in our paper were run in parallel on Harvard's FASRC cluster.
