@@ -174,7 +174,7 @@ def mc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
         ps = ps/np.sum(ps)
         n_eff_denom = np.sum(ps**2)
 
-        return p_plus/denominator, p_minus/denominator, (1./n_eff_denom)/num_samples
+        return p_plus/denominator, p_minus/denominator, (1./n_eff_denom)/(num_samples+1.)
 
 
 
