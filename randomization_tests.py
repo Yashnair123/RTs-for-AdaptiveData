@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+from tqdm import tqdm
 
 ''''
 This file contains the MCMC and MC randomization tests. Note that only
@@ -30,7 +31,7 @@ def mcmc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
         prev_proposal_weight = algo.get_proposal_weight(data, proposal, style)
         prev_data_weight = algo.get_data_weight(data)
         prev_point = copy.deepcopy(data)
-        for _ in range(starting_point):
+        for _ in tqdm(range(starting_point)):
             if _ > 0:
                 proposal, prob = algo.get_proposal(data, style)
                 prev_proposal_weight = algo.get_proposal_weight(prev_point, proposal, style)
@@ -59,7 +60,7 @@ def mcmc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
         prev_proposal_weight = algo.get_proposal_weight(data, proposal, style)
         prev_data_weight = algo.get_data_weight(data)
         prev_point = copy.deepcopy(data)
-        for _ in range(num_samples-starting_point):
+        for _ in tqdm(range(num_samples-starting_point)):
             if _ > 0:
                 proposal, prob = algo.get_proposal(data, style)
                 prev_proposal_weight = algo.get_proposal_weight(prev_point, proposal, style)
@@ -106,7 +107,7 @@ def mc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
 
         s_id = test_stat(data)
 
-        sample_prob_set = [algo.get_proposal(data, style) for i in range(num_samples)]
+        sample_prob_set = [algo.get_proposal(data, style) for i in tqdm(range(num_samples))]
         
         # the set of samples and probabilities for those samples, correspondingly
         sample_set = [sample_prob_set[i][0] for i in range(num_samples)]
@@ -125,7 +126,7 @@ def mc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
         ps = []
 
         # reverse order of list, because weights of actual resamples won't be 0 when under true data
-        for ind in list(reversed(list(range(len(sample_set))))):
+        for ind in tqdm(list(reversed(list(range(len(sample_set)))))):
             sample = sample_set[ind]
             proba = prob_set[ind]
             s = test_stat(sample)

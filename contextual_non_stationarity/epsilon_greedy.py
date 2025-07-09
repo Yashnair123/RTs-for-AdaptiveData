@@ -9,8 +9,6 @@ This file contains:
        in the setting of non-stationarity testing in
        a contextual bandit
     4. resampling weighting calculations for the above resampling procedures
-
-NB: set epsilon = 0 to simply get regular LinUCB
 """
 import numpy as np
 from sklearn.linear_model import Lasso

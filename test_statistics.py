@@ -50,6 +50,36 @@ def factored_bandit_distributional(data):
     return np.absolute(numerator/(denom1*denom2))
 
 
+def factored_bandit_distributional_more_arms(data):
+    # if data is flagged, simply return 0 as the score doesn't matter
+    if data == 'flag':
+        return 0
+    y2 = []
+    y4 = []
+    y1 = []
+    y3 = []
+    y0 = []
+    ys = [y0, y1, y2, y3, y4]
+
+    for ind in range(len(data)):
+        # adding 1 for bias column
+        ys[data[ind][0]].append(data[ind][1])
+    
+    if np.min([len(y1), len(y2), len(y3), len(y4)]) == 0:
+        return 0.
+    
+    if min(len(y2), len(y4)) == 1:
+        t1 = np.absolute((np.mean(y2) - np.mean(y4)))
+    else:
+        t1 = np.absolute((np.mean(y2) - np.mean(y4))/np.sqrt((np.std(y2)**2 + np.std(y4)**2)/2))
+    
+    if min(len(y1), len(y3)) == 1:
+        t2 = np.absolute((np.mean(y1) - np.mean(y3)))
+    else:
+        t2 = np.absolute((np.mean(y1) - np.mean(y3))/np.sqrt((np.std(y1)**2 + np.std(y3)**2)/2))
+    return max(t1,t2)
+
+
 def contextual_bandit_conditional_independence(data):
     '''This function is used both for hypothesis testing 
     and confidence interval construction.
@@ -70,6 +100,34 @@ def contextual_bandit_conditional_independence(data):
     regr.fit(X, y)
     y_pred = regr.predict(X)
     denom1 = np.sqrt(mean_squared_error(y, y_pred)*len(y)/(len(y)-4))
+    denom2 = np.sqrt(np.linalg.inv(X.T@X)[1][1])
+    numerator = regr.coef_[1]
+    return np.absolute(numerator/(denom1*denom2))
+
+def contextual_bandit_conditional_g(data):
+    '''This function is used both for hypothesis testing 
+    and confidence interval construction.
+    The b in the input corresponds to confidence interval. As default, b is set
+    to 0, in which case it is just regular testing'''
+    if data == 'flag':
+        return 0
+    X = []
+    y = []
+    regr = linear_model.LinearRegression()
+    #regr = linear_model.RidgeCV(cv=5)
+    for ind in range(len(data)):
+        # adding 1 for bias column
+        X.append(np.append([1., int(data[ind][0][0] == 1), int(data[ind][0][0] == 2)], data[ind][0][1]))
+        y.append(data[ind][1])
+    X, y = np.array(X), np.array(y)
+    
+    d = X.shape[1]
+    if np.linalg.matrix_rank(X) < d:
+        return 0.
+
+    regr.fit(X, y)
+    y_pred = regr.predict(X)
+    denom1 = np.sqrt(mean_squared_error(y, y_pred)*len(y)/(len(y)-d))
     denom2 = np.sqrt(np.linalg.inv(X.T@X)[1][1])
     numerator = regr.coef_[1]
     return np.absolute(numerator/(denom1*denom2))

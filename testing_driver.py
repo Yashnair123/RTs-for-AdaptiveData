@@ -2,12 +2,15 @@ import numpy as np
 import json
 import sys
 import matplotlib.pyplot as plt
+import os
 
 import bandit_non_stationarity.epsilon_greedy, bandit_non_stationarity.ucb, \
     factored_bandit_distributional.epsilon_greedy, factored_bandit_distributional.ucb, \
         contextual_bandit_distributional.elinucb, contextual_bandit_distributional.epsilon_greedy,\
             mdp_non_stationarity.epsilon_greedy, contextual_non_stationarity.elinucb, \
-                contextual_non_stationarity.epsilon_greedy
+                contextual_non_stationarity.epsilon_greedy, factored_bandit_more_arms.epsilon_greedy, \
+                factored_bandit_more_arms.ucb, contextual_bandit_distributional_g.epsilon_greedy, \
+                contextual_bandit_distributional_g.explore_commit, contextual_non_stationarity.biased_iid
 
 import test_statistics
 
@@ -15,8 +18,7 @@ import time
 
 from randomization_tests import mcmc_construct_rand_p_value, mc_construct_rand_p_value
 
-start = time.time()
-
+dim = int(sys.argv[11])
 setting = int(sys.argv[10])
 num_samples = int(sys.argv[9])
 epsilon = float(sys.argv[8])
@@ -32,16 +34,17 @@ alpha = 0.05
 styles = ['u', 'i_X', 'i', 'r', 'c', 'uu_X', 'ui_X', 'rui_X', 'iu_X', 'ii_X', 'comb', 'ri_X', 'ci_X']
 
 np.random.seed([setting, T, j, int(algo_name[0] == 'e'), int(null), styles.index(style), int(mc), int(100*epsilon), \
-    num_samples, trials])
+    num_samples, trials, dim])
 
 resamples = []
 
 eff_sample_ratios = []
 
 counts = []
+times = []
 # iterate through trials
 for job_ind in range(trials):
-    if job_ind % 10 == 0:
+    if job_ind % 1 == 0:
         print(job_ind)
     # obtain the correct algorithm
     if setting == 0:
@@ -77,10 +80,26 @@ for job_ind in range(trials):
             algorithm = contextual_non_stationarity.elinucb.ELinUCB(T, epsilon, 100, null, True if style=='c' else False)
         if algo_name == 'epsilon_greedy':
             algorithm = contextual_non_stationarity.epsilon_greedy.EpsilonGreedy(T, epsilon, 100, null, True if style=='c' else False)
-    
+        if algo_name == 'biased_iid':
+            algorithm = contextual_non_stationarity.biased_iid.BiasedIID(T, epsilon, 100, null)
+    if setting == 5:
+        test_stat = test_statistics.factored_bandit_distributional_more_arms
+        file_name = f'factored_bandit_more_arms/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}'
+        if algo_name == 'epsilon_greedy':
+            algorithm = factored_bandit_more_arms.epsilon_greedy.EpsilonGreedy(T, epsilon, null, True if style=='ci_X' else False)
+        if algo_name == 'ucb':
+            algorithm = factored_bandit_more_arms.ucb.UCB(T, null)
+    if setting == 6:
+        test_stat = test_statistics.contextual_bandit_conditional_g
+        file_name = f'contextual_bandit_distributional_g/results/{algo_name}_{T}_{num_samples}_{j}_{null}_{mc}_{style}_{epsilon}_{dim}'
+        if algo_name == 'epsilon_greedy':
+            algorithm = contextual_bandit_distributional_g.epsilon_greedy.EpsilonGreedy(T, epsilon, dim, null)
+        if algo_name == 'ec':
+            algorithm = contextual_bandit_distributional_g.explore_commit.ExploreCommit(T, dim, null)
     # get the true dataset
     true_data = algorithm.get_dataset()
 
+    start = time.time()
     # obtain the p-values
     if mc:
         p_plus, p_minus, eff_sample_ratio = mc_construct_rand_p_value(algorithm, true_data, test_stat, style, num_samples)
@@ -96,23 +115,36 @@ for job_ind in range(trials):
         counts.append(1-int(np.random.uniform() < (p_plus - alpha)/(p_plus - p_minus)))
     else:
         counts.append(1)
+    end = time.time()
 
-end = time.time()
+    times.append(end-start)
 
 # print the counts and mean and sd
 print(counts)
 print(np.mean(counts), np.std(counts)/np.sqrt(len(counts)))
 
 
+# delete the file if it exists
+if os.path.exists(file_name):
+    os.remove(file_name)
+
+# delete the file if it exists
+if os.path.exists(file_name+'_time'):
+    os.remove(file_name+'_time')
+
+if mc:
+    # delete the file if it exists
+    if os.path.exists(file_name+'_eff_samples'):
+        os.remove(file_name+'_eff_samples')
+
 # save file
 with open(file_name, 'w+') as f:
     json.dump(counts, f)
 
 
-elapsed_time = end-start
 # save time elapsed
 with open(file_name + '_time', 'w+') as f:
-    json.dump(elapsed_time, f)
+    json.dump(times, f)
 
 if mc:
     file_name = file_name + '_eff_samples'

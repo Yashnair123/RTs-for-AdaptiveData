@@ -2,6 +2,7 @@ import numpy as np
 import json
 import sys
 import copy
+import os
 
 import bandit_non_stationarity.epsilon_greedy, bandit_non_stationarity.ucb, \
     factored_bandit_distributional.epsilon_greedy, factored_bandit_distributional.ucb
@@ -10,8 +11,6 @@ import test_statistics
 import time
 
 from randomization_tests import mc_construct_rand_p_value, shared_mc_construct_rand_p_value
-
-start = time.time()
 
 num_samples = int(sys.argv[7])
 epsilon = float(sys.argv[6])
@@ -31,6 +30,7 @@ null = True # dummy setting of null; doesn't matter
 
 lengths = []
 coverage = []
+times = []
 # iterate through trials
 for job_ind in range(trials):
     counts = np.zeros(11)
@@ -62,6 +62,7 @@ for job_ind in range(trials):
     # continue
     # #####
 
+    start = time.time()
     p_pluses, p_minuses  = shared_mc_construct_rand_p_value(algorithm, true_data, test_stat, style, b_vals, num_samples)
 
     for indexer in range(len(b_vals)):
@@ -73,6 +74,10 @@ for job_ind in range(trials):
             counts[indexer] = 1
         else:
             counts[indexer] = 0
+
+    end = time.time()
+
+    times.append(end-start)
     
     # calculate length on the interval by using rounding of Chen, Chun, 
     # and Barber (2017) (to nearest integer)
@@ -103,9 +108,20 @@ print(np.mean(coverage), np.std(coverage)/np.sqrt(len(coverage)))
 length_file_name = f'length_shared/{algo_name}_{T}_{num_samples}_{j}_{style}_{epsilon}'
 coverage_file_name = f'coverage_shared/{algo_name}_{T}_{num_samples}_{j}_{style}_{epsilon}'
 
-end = time.time()
 
-elapsed_time = end-start
+
+# delete the file if it exists
+if os.path.exists(length_file_name):
+    os.remove(length_file_name)
+
+# delete the file if it exists
+if os.path.exists(length_file_name+'_time'):
+    os.remove(length_file_name+'_time')
+
+
+if os.path.exists(coverage_file_name+'_eff_samples'):
+    os.remove(coverage_file_name+'_eff_samples')
+
 
 
 with open(length_file_name, 'w+') as f:
@@ -114,7 +130,7 @@ with open(length_file_name, 'w+') as f:
 
 # save time in the length file
 with open(length_file_name + '_time', 'w+') as f:
-    json.dump(elapsed_time, f)
+    json.dump(times, f)
 
 with open(coverage_file_name, 'w+') as f:
         json.dump(coverage, f)
