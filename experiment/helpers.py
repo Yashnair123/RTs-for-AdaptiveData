@@ -834,7 +834,7 @@ def factored_bandit_distributional_score(full_data, null_hypothesis_g):
 
 
 
-def r2_stationarity_score(data):
+def stationarity_score(data):
     if data == 'flag':
         return 0.
     test_stats = []

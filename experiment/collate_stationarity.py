@@ -29,7 +29,7 @@ for method_indexer in range(6):
     randomized_reject_arrays[(method_indexer)] = []
 
 for job in range(500):
-    df = pd.read_csv(f'r2_stationarity_results/eps_{int(100*epsilon)}_job{job}.csv')
+    df = pd.read_csv(f'stationarity_results/eps_{int(100*epsilon)}_job{job}.csv')
     for method_indexer in range(4):    
         for index, row in df.iterrows():
             p_plus = row.iloc[method_to_column_indexer_p_plus[method_indexer]]

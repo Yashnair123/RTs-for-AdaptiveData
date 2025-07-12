@@ -7,7 +7,7 @@ pd.set_option('future.no_silent_downcasting', True)
 
 
 from helpers import restricted_epsilon_greedy, mc_nonstationarity_construct_rand_p_value,\
-    r2_stationarity_score
+    stationarity_score
 
 job = int(sys.argv[1])
 np.random.seed(job)
@@ -77,16 +77,16 @@ print("----------------------------------")
 print(f'Results for eps={epsilon}')
 
 iid_result = mc_nonstationarity_construct_rand_p_value(iid_data, \
-                                            r2_stationarity_score, 'i', 1., \
+                                            stationarity_score, 'i', 1., \
                                                 num_samples=1000)
 imitation_result = mc_nonstationarity_construct_rand_p_value(true_data, \
-                                            r2_stationarity_score, 'i', epsilon, \
+                                            stationarity_score, 'i', epsilon, \
                                                 num_samples=1000)
 reimitation_result = mc_nonstationarity_construct_rand_p_value(true_data, \
-                                            r2_stationarity_score, 'r', epsilon, \
+                                            stationarity_score, 'r', epsilon, \
                                                 num_samples=1000)
 condimitation_result = mc_nonstationarity_construct_rand_p_value(true_data, \
-                                            r2_stationarity_score, 'c', epsilon, \
+                                            stationarity_score, 'c', epsilon, \
                                                 num_samples=1000, coin_flips=true_coinflips)
 
 
@@ -101,5 +101,5 @@ summary_df = pd.DataFrame({"iid p_plus": [iid_result[0]], \
                         "condimitation p_minus": [condimitation_result[1]]})
 
 print(summary_df)
-summary_df.to_csv(f'r2_stationarity_results/eps_{int(100*epsilon)}_job{job}.csv', index=False)
+summary_df.to_csv(f'stationarity_results/eps_{int(100*epsilon)}_job{job}.csv', index=False)
 print("----------------------------------")
