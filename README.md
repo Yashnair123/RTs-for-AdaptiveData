@@ -1,7 +1,7 @@
 # RTs-for-AdaptiveData
 
 ## Code layout for simulations
-Our code is comprised of 1. key runscripts that we run across many simulations which we call "driver" runscripts; 2. simulation-specific scripts (containing functions particular to the environment, adaptive assignment algorithm, and resampling procedure being considered in the particular simulation); and 3. global scripts used across all simulations (i.e., test statistics as well as the weighted MC and unweighted MCMC randomization tests themselves). We describe these three types of scripts below. 
+Our code is comprised of 1. key runscripts that we run across many simulations which we call "driver" runscripts; 2. simulation-specific scripts (containing functions particular to the environment, adaptive assignment algorithm, and resampling procedure being considered in the particular simulation); and 3. global scripts used across all simulations (i.e., test statistics as well as the weighted MC and unweighted MCMC randomization tests themselves). We describe these three types of scripts below. The code to reproduce the simulation results concerning robsutness to misspecification of epsilon Section 4.2.1 is discussed at the end.
 
 ### Driver runscripts
 There are three driver runscripts to be used to reproduce our simulations: 1. `testing_driver.py`, 2. `interval_driver.py`, and 3. `conformal_interval_driver_share.py`. These three scripts are, respectively, responsible for running 1. hypothesis testing simulations, 2. confidence and conformal prediction interval construction (without sample sharing) simulations, and 3. conformal prediction interval construction with sample sharing simulations. 
@@ -78,3 +78,7 @@ To plot results, transfer the directories `collated_results` and `collated_inter
 ## Code layout for real data analysis
 
 All code for our real data analysis is in the `experiment` directory. The file `helpers.py` contains code for the adaptive assignment algorithm, resampling algorithms, weighted MC randomization test, and test statistics. The scripts `stationarity.py` and `conditional_independence.py` are the driver scripts used to produce our non-stationarity testing and conditional independence testing results. Jobs are submitted via the batch scripts `stationarity_runscript.sh` and `cond_indep_runscript.sh` and we use the scripts `collate_stationarity.py` and `collate_cond_indep.py` to collate the results into LaTeX tables, stored in the directory `experiment/latex_tables`.
+
+
+## Robustness to misspecification of epsilon
+The workflow here is similar to as before. `robustness_check.py` is the driver script which is run via the runscript `robustness_runscript.sh`. The file `collate_robustness_results.py` is used to collate the results and `robustness.ipynb` to plot them.

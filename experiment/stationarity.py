@@ -88,6 +88,9 @@ reimitation_result = mc_nonstationarity_construct_rand_p_value(true_data, \
 condimitation_result = mc_nonstationarity_construct_rand_p_value(true_data, \
                                             stationarity_score, 'c', epsilon, \
                                                 num_samples=1000, coin_flips=true_coinflips)
+iid_misspec_result = mc_nonstationarity_construct_rand_p_value(true_data, \
+                                            stationarity_score, 'i', 1., \
+                                                num_samples=1000, coin_flips=true_coinflips)
 
 
 
@@ -98,7 +101,9 @@ summary_df = pd.DataFrame({"iid p_plus": [iid_result[0]], \
                         "reimitation p_plus": [reimitation_result[0]],\
                         "reimitation p_minus": [reimitation_result[1]],\
                         "condimitation p_plus": [condimitation_result[0]],\
-                        "condimitation p_minus": [condimitation_result[1]]})
+                        "condimitation p_minus": [condimitation_result[1]],\
+                        "iid misspec p_plus": [iid_misspec_result[0]],\
+                        "iid misspec p_minus": [iid_misspec_result[1]]})
 
 print(summary_df)
 summary_df.to_csv(f'stationarity_results/eps_{int(100*epsilon)}_job{job}.csv', index=False)

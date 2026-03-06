@@ -178,6 +178,109 @@ def mc_construct_rand_p_value(algo, data, test_stat, style, num_samples=1000):
 
 
 
+def mc_construct_rand_p_value_with_weights(algo, algo2, data, test_stat, style, num_samples=1000):
+        '''
+        Construct the unweighted MCMC randomization test's p-values using
+        permuted serial sampler
+        '''
+        # p_plus and p_minus will be unnormalized p values; denominator
+        # is the normalizing factor. We return the correctly normalized
+        # p values at the end
+        denominator = 0.
+        p_plus = 0.
+        p_minus = 0.
+
+
+        s_id = test_stat(data)
+
+        sample_prob_set = [algo.get_proposal(data, style) for i in range(num_samples)]
+        
+        # the set of samples and probabilities for those samples, correspondingly
+        sample_set = [sample_prob_set[i][0] for i in range(num_samples)]
+        prob_set = [sample_prob_set[i][1] for i in range(num_samples)]
+        prob_set2 = [algo2.get_proposal_weight(sample_set[i],data,style) for i in range(num_samples)]
+
+
+
+
+        # add the original data to the list of samples
+        orig_data_probs = algo.get_proposal_weight(data, data, style)
+        orig_data_probs2 = algo2.get_proposal_weight(data, data, style)
+
+        sample_set.append(data)
+        prob_set.append(orig_data_probs)
+        prob_set2.append(orig_data_probs2)
+
+        
+        n_eff_denom = 0.
+
+        ps = []
+        ps2 = []
+
+        weights = []
+        weights2 = []
+        # reverse order of list, because weights of actual resamples won't be 0 when under true data
+        for ind in list(reversed(list(range(len(sample_set))))):
+            sample = sample_set[ind]
+            proba = prob_set[ind]
+            proba2 = prob_set2[ind]
+            s = test_stat(sample)
+
+            weight = algo.get_data_weight(sample)
+            weight2 = algo2.get_data_weight(sample)
+
+            
+
+            # instead of simply calculating the product of all samples, 
+            # recognize that the independence of all of our sampling schemes
+            # guarantees that we may write the conditional probability of the
+            # remaining M-1 samples given the ith as 
+            # a_1 * a_2 * ... * a_{i-1}*a_{i+1}*... * a_M
+            # = a_1 * a_2 * ... * a_M/a_i. The numerator a_1 * a_2 * ... * a_M
+            # is constant and in the numerator and denominator and may thus be cancelled
+            # so that we only need multiply by 1/a_i, the inverse of the ith proposal probability
+            
+            # need to behave differently if style involves simulation1, simulation2, or simulation3
+            # permutations at first
+            if style in ['s1s', 's2s', 's3s']:
+                weight_list = []
+                for second_ind in range(len(sample_set)):
+                    # don't want to include same index
+                    if second_ind != ind:
+                        weight_list.append(algo.get_proposal_weight(sample_set[second_ind],\
+                             sample_set[ind], style))
+
+                # obtain the weight list at the first timestep so that we can divide all future ones
+                # by it to ensure weights aren't too small
+                weight_list.sort()
+                if ind == len(sample_set)-1:
+                    first_weight_list = copy.deepcopy(weight_list)
+                    p_i = weight # just the first sample will have the resampling weight as 1 
+                    # because we divide by it
+                else:
+                    p_i = np.prod(np.array(weight_list)/np.array(first_weight_list))*weight
+            else:
+                p_i = (1./proba)*weight
+                p_i2 = (1./proba2)*weight2
+
+            
+            ps.append(p_i) # appending to list so that denom calculation doesn't get too small
+            ps2.append(p_i2)
+            denominator += p_i
+            p_plus += p_i if s >= s_id else 0
+            p_minus += p_i if s > s_id else 0
+        
+        ps = np.array(ps)
+        ps = ps/np.sum(ps)
+
+        ps2 = np.array(ps2)
+        ps2 = ps2/np.sum(ps2)
+        n_eff_denom = np.sum(ps**2)
+
+        return p_plus/denominator, p_minus/denominator, (1./n_eff_denom)/(num_samples), ps, ps2
+
+
+
 #############################################################
 ## USE THE BELOW ONLY FOR CONFIDENCE INTERVAL CONSTRUCTION ##
 #############################################################

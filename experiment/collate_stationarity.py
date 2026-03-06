@@ -12,10 +12,11 @@ num_trials = 500
 method_p_value_names = ['uniform iid',
                         r"$\text{imitation}_{\pi}$",
                         r"$\text{re-imitation}_{\pi}$",
-                        r"$\text{cond-imitation}_{\pi}$"]
+                        r"$\text{cond-imitation}_{\pi}$",
+                        'iid misspecified']
 
-method_to_column_indexer_p_plus = [0, 2, 4, 6]
-method_to_column_indexer_p_minus = [1,3,5,7]
+method_to_column_indexer_p_plus = [0, 2, 4, 6, 8]
+method_to_column_indexer_p_minus = [1,3,5,7,9]
 
 
 method_arrays = []
@@ -30,7 +31,7 @@ for method_indexer in range(6):
 
 for job in range(500):
     df = pd.read_csv(f'stationarity_results/eps_{int(100*epsilon)}_job{job}.csv')
-    for method_indexer in range(4):    
+    for method_indexer in range(5):    
         for index, row in df.iterrows():
             p_plus = row.iloc[method_to_column_indexer_p_plus[method_indexer]]
             p_minus = row.iloc[method_to_column_indexer_p_minus[method_indexer]]

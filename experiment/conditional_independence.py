@@ -111,13 +111,16 @@ im_results = [mc_construct_rand_p_value(true_data, null_hypothesis_g, \
                                             factored_bandit_distributional_score, 'i_X', epsilon, \
                                                 num_samples=1000) for null_hypothesis_g in nulls]
 
-
+iid_misspec_results = [mc_construct_rand_p_value(true_data, null_hypothesis_g, \
+                                            factored_bandit_distributional_score, 'i_X', 1., \
+                                            num_samples=1000) for null_hypothesis_g in nulls]
 
 summary_df = pd.DataFrame({"iid p_plus": [result[0] for result in iid_results], \
                             "iid p_minus": [result[1] for result in iid_results], \
                         "im_X p_plus": [result[0] for result in im_results],\
                         "im_X p_minus": [result[1] for result in im_results],\
-                            })
+                        "iid misspec p_plus": [result[0] for result in iid_misspec_results], \
+                        "iid misspec p_minus": [result[1] for result in iid_misspec_results]})
 
 summary_df.index = null_names
 print(summary_df)
@@ -126,12 +129,15 @@ print("----------------------------------")
 
 imX_rejections = []
 iid_rejections = []
+iid_miss_rejections = []
 for null_ind in range(11):
     im_result = im_results[null_ind]
     iid_result = iid_results[null_ind]
+    iid_miss_result = iid_misspec_results[null_ind]
 
     imX_p_plus, imX_p_minus = im_result[:2]
     iid_p_plus, iid_p_minus = iid_result[:2]
+    iid_miss_p_plus, iid_miss_p_minus = iid_miss_result[:2]
     
     
     if imX_p_minus > alpha:
@@ -149,14 +155,24 @@ for null_ind in range(11):
     else:
         iid_randomized_rejection = 1
 
+
+    if iid_miss_p_minus > alpha:
+        iid_miss_randomized_rejection = 0
+    elif iid_miss_p_plus > alpha:
+        iid_miss_randomized_rejection = 1-int(np.random.uniform() < (iid_miss_p_plus - alpha)/(iid_miss_p_plus - iid_miss_p_minus))
+    else:
+        iid_miss_randomized_rejection = 1
+
     imX_rejections.append(imX_randomized_rejection)
     iid_rejections.append(iid_randomized_rejection)
+    iid_miss_rejections.append(iid_miss_randomized_rejection)
 
 imX_avg_power = np.mean(imX_rejections)
 iid_avg_power = np.mean(iid_rejections)
+iid_miss_avg_power = np.mean(iid_miss_rejections)
 
 
-power_results = [imX_avg_power, iid_avg_power]
+power_results = [imX_avg_power, iid_avg_power, iid_miss_avg_power]
 with open(f"cond_indep_rejection_results/powers_j{job}.csv", "at") as file:
     file.write(",".join(map(str, power_results)) + "\n")
         

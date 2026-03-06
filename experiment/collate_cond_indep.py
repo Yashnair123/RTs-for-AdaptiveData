@@ -9,7 +9,8 @@ num_trials = 500
 
 method_p_value_names = [
                         "uniform iid",
-                        r"$\text{imitation}_X$"]
+                        r"$\text{imitation}_X$",
+                        "iid misspecified"]
 null_names = [
 "T1=T2",
 "T1=T3",
@@ -24,8 +25,8 @@ null_names = [
 'T1=T2=T3=T4'
 ]
 
-method_to_column_indexer_p_plus = [0,2]
-method_to_column_indexer_p_minus = [1,3]
+method_to_column_indexer_p_plus = [0,2,4]
+method_to_column_indexer_p_minus = [1,3,5]
 
 
 method_arrays = []
@@ -35,7 +36,7 @@ reject_arrays = dict()
 randomized_reject_arrays = dict()
 ess_arrays = dict()
 
-for method_indexer in range(2):
+for method_indexer in range(3):
     for index in range(11):
         reject_arrays[(method_indexer, index)] = []
         randomized_reject_arrays[(method_indexer, index)] = []
@@ -43,7 +44,7 @@ for method_indexer in range(2):
 
 for job in range(500):
     df = pd.read_csv(f'im_X_experiment_results/eps_{int(100*epsilon)}_job{job}.csv')
-    for method_indexer in range(2):    
+    for method_indexer in range(3):    
         for index, row in df.iterrows():
             p_plus = row.iloc[method_to_column_indexer_p_plus[method_indexer]]
             p_minus = row.iloc[method_to_column_indexer_p_minus[method_indexer]]
